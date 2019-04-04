@@ -5,10 +5,18 @@ import time
 import caffe2.python.onnx.backend as backend
 import numpy as np
 import onnx
-
+import torch
+import torchvision
 
 PORT_NUMBER = 8080
 start = time.time()
+
+# Temporarily create and save model here: TODO: Create mechanism to load ONNX Model from a Repo.
+dummy_input = torch.randn(10, 3, 224, 224, device='cpu')   # or cuda
+model = torchvision.models.alexnet(pretrained=True).cpu()  # or cuda()
+input_names = ["actual_input_1"] + ["learned_%d" % i for i in range(16)]
+output_names = ["output1"]
+torch.onnx.export(model, dummy_input, "alexnet.onnx", verbose=True, input_names=input_names, output_names=output_names)
 
 # Load the ONNX model
 model = onnx.load("alexnet.onnx")
